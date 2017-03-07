@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Perlin noise | Fireball explosion</title>
+        <meta charset="utf-8">
+		<style>*{box-sizing:border-box; margin:0; padding:0;}</style>
+   </head>
+
+    <body>
+        <div id="container"></div>
+    </body>
+
+    <script src="js/three.min.js"></script>
+    <script src="js/OrbitControls.js"></script>
+
+    <script type="x-shader/x-vertex" id="vertexShader">
+varying vec2 vUv;
+
+void main() {
+
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+}
+    </script>
+
+    <script type="x-shader/x-vertex" id="fragmentShader">
+varying vec2 vUv;
+
+void main() {
+
+    gl_FragColor = vec4( vec3( vUv, 0. ), 1. );
+
+}
+    </script>
+
+    <script type="text/javascript" id="mainCode">
+
+ var
+    container,
+    renderer,
+    scene,
+    camera,
+    mesh,
+    start = Date.now(),
+    fov = 30;
+
+window.addEventListener( 'load', function() {
+
+    container = document.getElementById( "container" );
+
+    scene = new THREE.Scene();
+
+    camera = new THREE.PerspectiveCamera(
+        fov,
+        window.innerWidth / window.innerHeight,
+        1,
+        10000 );
+    camera.position.z = 100;
+
+    material = new THREE.ShaderMaterial( {
+        vertexShader: document.getElementById( 'vertexShader' ).textContent,
+        fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+    } );
+
+    mesh = new THREE.Mesh(
+        new THREE.IcosahedronGeometry( 20, 4 ),
+        material
+    );
+    scene.add( mesh );
+
+    renderer = new THREE.WebGLRenderer();
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.setPixelRatio( window.devicePixelRatio );
+
+    container.appendChild( renderer.domElement );
+
+    var controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+    onWindowResize();
+    window.addEventListener( 'resize', onWindowResize );
+
+    render();
+
+} );
+
+function onWindowResize () {
+
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	camera.aspect = window.innerWidth / window.innerHeight;
+	camera.updateProjectionMatrix();
+
+}
+
+function render() {
+
+    renderer.render( scene, camera );
+    requestAnimationFrame( render );
+
+}
+
+    </script>
+
+</html>
